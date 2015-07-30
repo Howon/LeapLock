@@ -10,7 +10,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./scripts/routes/routes')(app)
+require('./routes/routes')(app)
 
 console.log("*****************************");
 console.log("* App running at port: " + config.port + " *");
