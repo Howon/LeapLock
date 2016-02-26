@@ -3,12 +3,12 @@ var path = require('path');
 var app = express();
 var http = require('http');
 var server = http.createServer(app);
-var config = require('./scripts/config')
+var config = require('./config/config')
 
 server.listen(config.port);
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'public/views'));
 app.set('view engine', 'jade');
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/static')));
 
 require('./routes/routes')(app)
 
