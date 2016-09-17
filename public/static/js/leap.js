@@ -6,11 +6,11 @@ let camera;
 let controlsl
 let stats;
 let material;
-let size = 7;
+let size = 3;
 var info, drawGeo, palm, fingers = [];
 
 init();
-
+let dataPoints = [];
 function init() {
   // Basics
   renderer = new THREE.WebGLRenderer({
@@ -24,9 +24,9 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 3000);
-  camera.position.set(-50, 200, 700);
+  camera.position.set(-50, 500, 600);
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(-50, 50, 0);
+  controls.target.set(-50, 50, 100);
 
   let light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(500, 500, 0);
@@ -88,35 +88,38 @@ function animate() {
 
 let gstate = new GestureState();
 
+let getCoord = (hand) => {
+  return {'x': hand.palmPosition[0], 'y': hand.palmPosition[1], 'z': hand.palmPosition[2]}
+}
+
 let visualizeFingers = function(hand, frame) {
   let len = frame.pointables.length;
-  if (len > 0) {
-    for (var i = 0; i < 5; i++) {
-      let finger = frame.pointables[i];
-      // console.log(finger);
-      // if (i < len) {
-        let pointable = frame.pointables[i];
-        let direction = v(pointable.direction[0] , pointable.direction[1], pointable.direction[2]); // best so far
-
-        if (hand) {
-          let hang = v(hand.direction[0], hand.direction[1], hand.direction[2]);
-          let dang = hang.angleTo(direction).toFixed(3);
-          let mesh = drawGeo.clone();
-          mesh.position.copy({'x': hand.palmPosition[0], 'y': hand.palmPosition[1], 'z': hand.palmPosition[2]});
-          mesh.translateZ(-10 - pointable.length);
-          // mesh.lookAt(direction.add(finger.position));
-          scene.add(mesh);
-        } else {
-          drawGeo.material = new THREE.MeshLambertMaterial({
-            color: '#D64E13',
-            opacity: 0.7
-          });
-        }
-      // } else {
-      //   fingers[i].visible = false;
-      // }
-    }
+  if (hand) {
+    let mesh = drawGeo.clone();
+    let coord = getCoord(hand);
+    mesh.position.copy(coord);
+    dataPoints.push(coord);
+    // mesh.translateZ(-10 - pointable.length);
+    // mesh.lookAt(direction.add(finger.position));
+    scene.add(mesh);
+  } else {
+    drawGeo.material = new THREE.MeshLambertMaterial({
+      color: '#D64E13',
+      opacity: 0.7
+    });
   }
+  // if (len > 0) {
+  //   for (var i = 0; i < 5; i++) {
+  //     let finger = frame.pointables[i];
+  //     // console.log(finger);
+  //     // if (i < len) {
+  //       let pointable = frame.pointables[i];
+  //       let direction = v(pointable.direction[0] , pointable.direction[1], pointable.direction[2]); // best so far
+  //     // } else {
+  //     //   fingers[i].visible = false;
+  //     // }
+  //   }
+  // }
   // else if (palm.hasFingers) {
     // for (var i = 0; i < 5; i++) {
     //   fingers[i].visible = false;
@@ -137,7 +140,7 @@ Leap.loop({
 }, function(frame) {
   let direction;
   let hand;
-  console.log(camera.position)
+  // console.log(camera.position)
   if (frame.hands.length > 0) {
     hand = frame.hands[0];
     let position = hand.palmPosition;
@@ -155,7 +158,7 @@ Leap.loop({
     // palm.visible = true;
     // palm.hasFingers = true;
     if (!gesture.locked) {
-      console.log(gesture);
+      // console.log(gesture);
   visualizeFingers(hand, frame);
     }
   } else {
