@@ -207,41 +207,6 @@ let getGesture = function(hand, position, gstate) {
   return new Gesture(hand.stabilizedPalmPosition[0], hand.stabilizedPalmPosition[1], hand.stabilizedPalmPosition[2], palmMoveDirection, swipeDirection, normalUp, gstate.locked);
 }
 
-let navigateLeapstaGram = function(gesture) {
-  let isLocked = (gesture.xpos === 0) && (gesture.ypos === 0) && (gesture.zpos === 0) ? true : false;
-  if (isLocked) {
-    delayLock = false;
-  }
-  if (imageMode) {
-    if (gesture.swipeDirection == 1) {
-      $('a.carousel-control.right').trigger('click')
-    } else if (gesture.swipeDirection == -1) {
-      $('a.carousel-control.left').trigger('click')
-
-    }
-  }
-  if (!isLocked) {
-    if (lockCounter === 2) {
-      imageMode = false;
-      toggleImages();
-      lockCounter = 0;
-      delayLock = true;
-    } else if (!delayLock) {
-      lockCounter = lockCounter <= 0 ? 0 : lockCounter - 1;
-    }
-  }
-
-  if (gesture.palmDirection !== 0 && lockCounter !== 2) {
-    if (gesture.palmDirection === 1) {
-      if (gesture.normalUp) {
-        imageMode = true;
-        toggleImages();
-        lockCounter = 2;
-      }
-    }
-  }
-};
-
 visualizeHand = function(controller) {
   controller.use('playback', {
     timeBetweenLoops: 100,

@@ -1,8 +1,16 @@
+let socket = io.connect();
+
 const BALL_SIZE = 1;
 
 let patterns = {};
 let patternCount = 0;
 let changeCount = false;
+
+let saveData = () => {
+  console.log('save');
+  // do ur shit
+  // save patterns variable?
+}
 
 let leapMotionControl = (frame) => {
   if (frame.hand) {
@@ -38,6 +46,10 @@ let leapMotionControl = (frame) => {
               delete patterns[patternCount];
             }
           }
+        }
+
+        if (!gesture.normalUp && gesture.palmDirection === -1) {
+          saveData();
         }
       }
     } else {
