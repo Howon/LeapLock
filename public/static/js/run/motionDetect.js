@@ -15,15 +15,17 @@ function GestureState() {
   this.palmCoolDown = 0;
 }
 
+const MIN_VALUE = 0.4;
+
 const MAXXPOS = 400;
 const MAXYPOS = 500;
 const MAXZPOS = 750;
-const PALMMOVEFRAMERATE = 4;
-const SWIPEFRAMERATE = 1;
-const PALMCOOLDOWN = 40;
-const SWIPECOOLDOWN = 15;
+const PALMMOVEFRAMERATE = 1;
+const SWIPEFRAMERATE = 2;
+const PALMCOOLDOWN = 50;
+const SWIPECOOLDOWN = 20;
 const PALMMOVEVELOCTIY = 500;
-const LOCKFRAMERATE = 20;
+const LOCKFRAMERATE = 20; // increase to have elongate fisting time
 
 function Gesture(xpos, ypos, zpos, pdirection, sdirection, normalUp, isLocked, swipeDir) {
   if (!isLocked) {
@@ -68,9 +70,10 @@ function checkFist(hand) {
     sum += dMetaProxi;
     sum += dProxiInter
   }
-  sum = sum / 10;
 
-  if (sum <= minValue && getExtendedFingers(hand) == 0) {
+  sum = sum / 15;
+
+  if (sum <= MIN_VALUE && getExtendedFingers(hand) == 0) {
     return true;
   } else {
     return false;
@@ -258,7 +261,7 @@ visualizeHand = function(controller) {
   controller.use('riggedHand', {
     scale: 1,
   });
-
-  let camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 3000);
-  camera.position.set(-400, 550, 600);
 };
+
+const SWIPE_LEFT = 1;
+const SWIPE_RIGHT = -1;
