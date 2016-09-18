@@ -8,12 +8,12 @@ let server = http.createServer(app);
 let io = require('socket.io').listen(server);
 let config = require('./config/config')
 
-// let serialPort = require("serialport");
-// let arduinoPort = new serialPort(config.arduino.port, {
-//   baudRate: 9600
-// });
+let serialPort = require("serialport");
+let arduinoPort = new serialPort(config.arduino.port, {
+  baudRate: 9600
+});
 let openLock = require('./scripts/openLock');
-// openLock.start(arduinoPort);
+openLock.start(arduinoPort);
 
 let firebase = require('firebase');
 firebase.initializeApp(config.firebase);

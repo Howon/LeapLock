@@ -66,10 +66,10 @@ let normalizeTime = (oldPath) => {
     }
 
     if (oldPathIndex === oldPath.length) {
-      break
+      break;
     }
 
-    newPath.push(oldPath[oldPathIndex])
+    newPath.push(oldPath[oldPathIndex]);
   }
 
   return newPath;
@@ -77,8 +77,8 @@ let normalizeTime = (oldPath) => {
 
 let toUnit = (vector) => {
   let length = Math.sqrt(Object.keys(vector)
-      .map((key) => Math.pow(vector[key], 2))
-      .reduce((l, r) => l + r));
+    .map((key) => Math.pow(vector[key], 2))
+    .reduce((l, r) => l + r));
 
   return {
     'x': vector['x'] * 1.0 / length,
@@ -89,17 +89,15 @@ let toUnit = (vector) => {
 
 let normalizeVectors = (vectors) => vectors.map(vec => toUnit(vec));
 
-let getSimilarity = (path1, path2) => {
-  return dotProduct(path1, path2);
-}
+let getSimilarity = (path1, path2) => dotProduct(path1, path2);
 
-const CORRECT_THRESHOLD = 45;
+const CORRECT_THRESHOLD = 80;
 
 let isCorrect = (path1, path2) => {
   if (getSimilarity(path1, path2) > CORRECT_THRESHOLD) {
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
 }
 
@@ -108,12 +106,12 @@ let isValidPath = (combinations, target) => {
     let returnFlag = true;
     Object.keys(pattern).forEach(key => {
       if (!target.hasOwnProperty(key) ||
-            !isCorrect(pattern[key], target[key])) {
+        !isCorrect(pattern[key], target[key])) {
         returnFlag = false;
       }
     })
     return returnFlag;
   }).length;
 
-  return numCorrect === registrationPatterns.length
+  return numCorrect === registrationPatterns.length;
 }
