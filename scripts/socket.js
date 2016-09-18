@@ -1,6 +1,5 @@
 'use strict'
 
-
 let sampleJson = require('../data/samplePath');
 
 module.exports = function(io, firebase) {
