@@ -13,6 +13,14 @@ io.on('connection', function(socket){
   	console.log(err);
   	console.log(data.toString());
   });
+
+  socket.on('patterns', function(data) {
+    console.log(data)
+    console.log(data.patterns);
+    
+    // more socket stuff
+  });
+
 });
 
 

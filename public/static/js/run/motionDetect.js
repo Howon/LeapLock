@@ -15,15 +15,17 @@ function GestureState() {
   this.palmCoolDown = 0;
 }
 
+const MIN_VALUE = 0.4;
+
 const MAXXPOS = 400;
 const MAXYPOS = 500;
 const MAXZPOS = 750;
-const PALMMOVEFRAMERATE = 4;
-const SWIPEFRAMERATE = 1;
-const PALMCOOLDOWN = 40;
-const SWIPECOOLDOWN = 15;
+const PALMMOVEFRAMERATE = 1;
+const SWIPEFRAMERATE = 2;
+const PALMCOOLDOWN = 50;
+const SWIPECOOLDOWN = 20;
 const PALMMOVEVELOCTIY = 500;
-const LOCKFRAMERATE = 20;
+const LOCKFRAMERATE = 20; // increase to have elongate fisting time
 
 function Gesture(xpos, ypos, zpos, pdirection, sdirection, normalUp, isLocked, swipeDir) {
   if (!isLocked) {
@@ -68,9 +70,10 @@ function checkFist(hand) {
     sum += dMetaProxi;
     sum += dProxiInter
   }
-  sum = sum / 10;
 
-  if (sum <= minValue && getExtendedFingers(hand) == 0) {
+  sum = sum / 15;
+
+  if (sum <= MIN_VALUE && getExtendedFingers(hand) == 0) {
     return true;
   } else {
     return false;
@@ -204,41 +207,6 @@ let getGesture = function(hand, position, gstate) {
   return new Gesture(hand.stabilizedPalmPosition[0], hand.stabilizedPalmPosition[1], hand.stabilizedPalmPosition[2], palmMoveDirection, swipeDirection, normalUp, gstate.locked);
 }
 
-let navigateLeapstaGram = function(gesture) {
-  let isLocked = (gesture.xpos === 0) && (gesture.ypos === 0) && (gesture.zpos === 0) ? true : false;
-  if (isLocked) {
-    delayLock = false;
-  }
-  if (imageMode) {
-    if (gesture.swipeDirection == 1) {
-      $('a.carousel-control.right').trigger('click')
-    } else if (gesture.swipeDirection == -1) {
-      $('a.carousel-control.left').trigger('click')
-
-    }
-  }
-  if (!isLocked) {
-    if (lockCounter === 2) {
-      imageMode = false;
-      toggleImages();
-      lockCounter = 0;
-      delayLock = true;
-    } else if (!delayLock) {
-      lockCounter = lockCounter <= 0 ? 0 : lockCounter - 1;
-    }
-  }
-
-  if (gesture.palmDirection !== 0 && lockCounter !== 2) {
-    if (gesture.palmDirection === 1) {
-      if (gesture.normalUp) {
-        imageMode = true;
-        toggleImages();
-        lockCounter = 2;
-      }
-    }
-  }
-};
-
 visualizeHand = function(controller) {
   controller.use('playback', {
     timeBetweenLoops: 100,
@@ -258,7 +226,7 @@ visualizeHand = function(controller) {
   controller.use('riggedHand', {
     scale: 1,
   });
-
-  let camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 3000);
-  camera.position.set(-400, 550, 600);
 };
+
+const SWIPE_LEFT = 1;
+const SWIPE_RIGHT = -1;
