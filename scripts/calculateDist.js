@@ -16,7 +16,7 @@ let distance = (p1, p2) => {
   }
   return Math.sqrt(
     Object.keys(p1)
-    .map((key) => Math.pow(p1[key] - p1[key], 2))
+    .map((key) => Math.pow(p1[key] - p2[key], 2))
     .reduce((l, r) => l + r));
 }
 
@@ -29,23 +29,22 @@ let getVectors = (path) => {
         'x': p['x'] - path[i - 1]['x'],
         'y': p['y'] - path[i - 1]['y'],
         'z': p['z'] - path[i - 1]['z']
-      }
+      };
     }
   });
 }
 
 let dotProduct = (vector1, vector2) => {
-  let minLen = Math.min(vector1.length, vector2.length);
-
   let dot = (v1, v2) => {
     return Object.keys(v1)
       .map((key) => v1[key] * v2[key])
       .reduce((l, r) => l + r);
   }
 
-  return vector1.filter((v, i) => i < minLen)
-    .map((v, i) => dot(v, vector2[i]))
-    .reduce((l, r) => l + r);
+  return vector1.map((v, i) => {
+      let temp = dot(v, vector2[i]);
+      return temp;
+    }).reduce((l, r) => l + r);
 }
 
 const SAMPLE_POINTS = 100;
@@ -55,12 +54,11 @@ let normalizeTime = (oldPath) => {
   let step = pathLength * 1.0 / (SAMPLE_POINTS + 60);
 
   let oldPathIndex = 1;
-  return oldPath.map((vec, index) => {
-    if (index === 0) {
-      return vec;
-    }
+  let newPath = [];
+  newPath[0] = oldPath[0];
 
-    while (distance(oldPath[index], oldPath[oldPathIndex]) < step) {
+  for (let i = 0; i < SAMPLE_POINTS - 1; i++) {
+    while (distance(newPath[i], oldPath[oldPathIndex]) < step) {
       oldPathIndex++;
       if (oldPathIndex === oldPath.length) {
         break;
@@ -68,22 +66,24 @@ let normalizeTime = (oldPath) => {
     }
 
     if (oldPathIndex === oldPath.length) {
-      return null;
+      break
     }
 
-    return oldPath[oldPathIndex];
-  }).filter(x => x !== null);
+    newPath.push(oldPath[oldPathIndex])
+  }
+
+  return newPath;
 }
 
 let toUnit = (vector) => {
-  let length = Object.keys(vector)
+  let length = Math.sqrt(Object.keys(vector)
       .map((key) => Math.pow(vector[key], 2))
-      .reduce((l, r) => l + r);
+      .reduce((l, r) => l + r));
 
   return {
-    'x': vector['x'] / length,
-    'y': vector['y'] / length,
-    'z': vector['z'] / length,
+    'x': vector['x'] * 1.0 / length,
+    'y': vector['y'] * 1.0 / length,
+    'z': vector['z'] * 1.0 / length,
   }
 }
 
@@ -100,7 +100,10 @@ let totalNormalize = (path) => {
 let getSimilarity = (path1, path2) => {
   let p1_norm = totalNormalize(path1);
   let p2_norm = totalNormalize(path2);
-  return dotProduct(p1_norm, p2_norm);
+
+  let dotProducts = dotProduct(p1_norm, p2_norm);
+
+  return dotProducts
 }
 
 const CORRECT_THRESHOLD = 45;
@@ -123,17 +126,19 @@ let attempt = require('../data/attempt.json');
 let wrongLock = require('../data/wrongLock.json');
 let lock = require('../data/lock.json');
 
-console.log(getSimilarity(attempt, lock));// + " " + isCorrect(attempt, lock));
-// console.log(getSimilarity(wrongLock, lock) + " " + isCorrect(wrongLock, lock));
-// console.log(getSimilarity(attempt, wrongLock) + " " + isCorrect(attempt, wrongLock));
+console.log(getSimilarity(attempt, lock) + " " + isCorrect(attempt, lock));
+console.log(getSimilarity(wrongLock, lock) + " " + isCorrect(wrongLock, lock));
+console.log(getSimilarity(attempt, wrongLock) + " " + isCorrect(attempt, wrongLock));
+console.log(getSimilarity(lock, lock) + " " + isCorrect(lock, lock));
 
-// let attempt2 = require('../data/attempt2.json');
-// let wrongLock2 = require('../data/wrongLock2.json');
-// let lock2 = require('../data/lock2.json');
+let attempt2 = require('../data/attempt2.json');
+let wrongLock2 = require('../data/wrongLock2.json');
+let lock2 = require('../data/lock2.json');
 
-// console.log(getSimilarity(attempt2, lock2) + " " + isCorrect(attempt2, lock2));
-// console.log(getSimilarity(wrongLock2, lock2) + " " + isCorrect(wrongLock2, lock2));
-// console.log(getSimilarity(attempt2, wrongLock2) + " " + isCorrect(attempt2, wrongLock2));
+console.log(getSimilarity(attempt2, lock2) + " " + isCorrect(attempt2, lock2));
+console.log(getSimilarity(wrongLock2, lock2) + " " + isCorrect(wrongLock2, lock2));
+console.log(getSimilarity(attempt2, wrongLock2) + " " + isCorrect(attempt2, wrongLock2));
+console.log(getSimilarity(lock, lock) + " " + isCorrect(lock, lock));
 
 
 // print 'attempt, lock', getSimilarity(attempt, lock), isCorrect(attempt, lock)

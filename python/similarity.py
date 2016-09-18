@@ -1,7 +1,7 @@
 import json
 import math
 from pprint import pprint
-import serial
+# import serial
 
 ''' Read file to object '''
 def readData(filename):
@@ -17,12 +17,12 @@ def getPathLength(path):
     return length
 
 def distance(p1, p2):
-    x_sq = math.pow(p2['x'] - p1['x'], 2) 
-    y_sq = math.pow(p2['y'] - p1['y'], 2) 
-    z_sq = math.pow(p2['z'] - p1['z'], 2) 
+    x_sq = math.pow(p2['x'] - p1['x'], 2)
+    y_sq = math.pow(p2['y'] - p1['y'], 2)
+    z_sq = math.pow(p2['z'] - p1['z'], 2)
     sum = x_sq + y_sq + z_sq
     return math.sqrt(sum)
-        
+
 
 ''' Given path of x, y, z return vector '''
 def getVectors(path):
@@ -39,17 +39,17 @@ def getVectors(path):
 def dotProduct(vector1, vector2):
     product = 0
     for i in range(0, min(len(vector1), len(vector2))):
-        x = vector1[i]['x'] * vector2[i]['x'] 
+        x = vector1[i]['x'] * vector2[i]['x']
         y = vector1[i]['y'] * vector2[i]['y']
         z = vector1[i]['z'] * vector2[i]['z']
         product += x + y + z
     return product
 
 def normalizeTime(oldPath):
-    numPoints = 100 
+    numPoints = 100
     pathLength = getPathLength(oldPath)
     step = pathLength / float(numPoints + 60)
-    
+
     oldPathIndex = 1
     newPath = []
     newPath.append(oldPath[0])
@@ -64,7 +64,7 @@ def normalizeTime(oldPath):
 
         newPath.append(oldPath[oldPathIndex])
         #print 'i', i
-    return newPath 
+    return newPath
 
 def toUnit(vector):
     x_sq = math.pow(vector['x'], 2)
@@ -83,7 +83,7 @@ def normalizeVectors(vectors):
         unitVector = toUnit(vector)
         normalizedVectors.append(unitVector)
     return normalizedVectors
-    
+
 def totalNormalize(path):
     tn_path = normalizeTime(path)
     tn_vec = getVectors(tn_path)
@@ -96,16 +96,16 @@ def getSimilarity(path1, path2):
     return dotProduct(p1_norm, p2_norm)
 
 def isCorrect(path1, path2):
-    ser = serial.Serial('/dev/tty.usbmodem1411', 9600)
-    ser.close()
-    ser.open()
+    # ser = serial.Serial('/dev/tty.usbmodem1411', 9600)
+    # ser.close()
+    # ser.open()
 
     if(getSimilarity(path1, path2) > 45):
-        ser.write('1')
+        # ser.write('1')
         print 1
         return 1
     else:
-        ser.write('0')
+        # ser.write('0')
         print 0
         return 0
 
