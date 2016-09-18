@@ -42,25 +42,22 @@ let dotProduct = (vector1, vector2) => {
   }
 
   return vector1.map((v, i) => {
-      return dot(v, vector2[i]);
-    }).reduce((l, r) => l + r);
+    return dot(v, vector2[i]);
+  }).reduce((l, r) => l + r);
 }
 
 const SAMPLE_POINTS = 100;
 
 let normalizeTime = (oldPath) => {
-  if (oldPath.length < SAMPLE_POINTS) {
-    return oldPath;
-  }
-
+  let samplePoints = Math.min(oldPath.length, SAMPLE_POINTS);
   let pathLength = getPathLength(oldPath);
-  let step = pathLength * 1.0 / (SAMPLE_POINTS + 60);
+  let step = pathLength * 1.0 / (samplePoints + 60);
 
   let oldPathIndex = 1;
   let newPath = [];
   newPath[0] = oldPath[0];
 
-  for (let i = 0; i < SAMPLE_POINTS - 1; i++) {
+  for (let i = 0; i < samplePoints - 1; i++) {
     while (distance(newPath[i], oldPath[oldPathIndex]) < step) {
       oldPathIndex++;
       if (oldPathIndex === oldPath.length) {
@@ -76,4 +73,32 @@ let normalizeTime = (oldPath) => {
   }
 
   return newPath;
+}
+
+let toUnit = (vector) => {
+  let length = Math.sqrt(Object.keys(vector)
+      .map((key) => Math.pow(vector[key], 2))
+      .reduce((l, r) => l + r));
+
+  return {
+    'x': vector['x'] * 1.0 / length,
+    'y': vector['y'] * 1.0 / length,
+    'z': vector['z'] * 1.0 / length,
+  }
+}
+
+let normalizeVectors = (vectors) => vectors.map(vec => toUnit(vec));
+
+let getSimilarity = (path1, path2) => {
+  return dotProduct(path1, path2);
+}
+
+const CORRECT_THRESHOLD = 45;
+
+let isCorrect = (path1, path2) => {
+  if (getSimilarity(path1, path2) > CORRECT_THRESHOLD) {
+    return true
+  } else {
+    return false
+  }
 }

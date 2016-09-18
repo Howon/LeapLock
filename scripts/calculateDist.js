@@ -1,30 +1,28 @@
 'use strict'
 
-let totalNormalize = (path) => {
-  let vec = getVectors(path);
-  return normalizeVectors(vec);
+let dotProduct = (vector1, vector2) => {
+  let dot = (v1, v2) => {
+    return Object.keys(v1)
+      .map((key) => v1[key] * v2[key])
+      .reduce((l, r) => l + r);
+  }
+
+  return vector1.map((v, i) => {
+      return dot(v, vector2[i]);
+    }).reduce((l, r) => l + r);
 }
 
 let getSimilarity = (path1, path2) => {
-  let p1_norm = totalNormalize(path1);
-  let p2_norm = totalNormalize(path2);
-
-  return dotProduct(p1_norm, p2_norm);
+  return dotProduct(path1, path2);
 }
 
 const CORRECT_THRESHOLD = 45;
 
 let isCorrect = (path1, path2) => {
-  // # ser = serial.Serial('/dev/tty.usbmodem1411', 9600)
-  // # ser.close()
-  // # ser.open()
-
   if (getSimilarity(path1, path2) > CORRECT_THRESHOLD) {
-    // # ser.write('1')
-    return 1
+    return true
   } else {
-    // # ser.write('0')
-    return 0
+    return false
   }
 }
 

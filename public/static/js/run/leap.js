@@ -1,19 +1,120 @@
 let socket = io.connect();
 
 const BALL_SIZE = 1;
+const NUM_REQUIRED_PATTERNS = 5;
 
 let patterns = {};
 let patternsBuffer = {};
 let patternCount = 0;
-let patternCountBuf = patternCount;
 let changeCount = false;
 
-let saveData = (saveBlock) => {
-  Object.keys(saveBlock).forEach(key => {
-    saveBlock[key] = normalizeTime(saveBlock[key].map(x => x.coord));
-  });
+let registering = false;
 
-  socket.emit('verifyPatterns', saveBlock);
+let resetRegistration = () => {
+  document.getElementById('registrationCount').style.display = "none";
+  document.getElementById('registerButton').style.backgroundColor = "#4CAF50";
+  registering = false;
+}
+
+let registerLock = () => {
+  if (!registering) {
+    registering = true;
+    deletePatterns(patterns);
+    document.getElementById('registerButton').style.backgroundColor = "red";
+    document.getElementById('registrationCount').style.display = "block";
+    document.getElementById('registrationCount').innerHTML =
+        "Patterns Left: " + numCount;
+  } else {
+    resetRegistration();
+  }
+}
+
+socket.on('registration', (data) => {
+  if (data.success) {
+    document.getElementById('registerButton').style.pointerEvents = 'auto';
+    registration = false;
+  }
+})
+
+let registrationPatterns = []
+let numCount = NUM_REQUIRED_PATTERNS;
+let tryAgain = false;
+
+let saveData = (saveBlock) => {
+  if (Object.keys(saveBlock).length > 0) {
+    let coords = {}
+
+    Object.keys(saveBlock).forEach(key => {
+      coords[key] = normalizeVectors(getVectors(normalizeTime(saveBlock[key].map(x => x.coord))));
+    });
+
+    tryAgain = false;
+
+    if (registering) {
+      deletePatterns(patterns);
+
+      let pathTooShort = false;
+
+      Object.keys(coords).forEach(path => {
+        if (coords[path].length < SAMPLE_POINTS) {
+          pathTooShort = true;
+        }
+      });
+
+      if (pathTooShort) {
+        document.getElementById('registrationCount').innerHTML =
+        "Patterns Left: " + numCount + " PATH TOO SHORT";
+      } else {
+        let numCorrect = registrationPatterns.filter(pattern => {
+          Object.keys(pattern).forEach(key => {
+            if (!(coords.hasOwnProperty(key) &&
+                  isCorrect(pattern[key], coords[key]))) {
+              return false;
+            }
+          })
+          return true;
+        }).length
+
+        console.log(numCorrect);
+        if (numCorrect === registrationPatterns.length) {
+          numCount--;
+          registrationPatterns.push(coords);
+          document.getElementById('registrationCount').innerHTML =
+            "Patterns Left: " + --numCount;
+        } else {
+          document.getElementById('registrationCount').innerHTML =
+            "Patterns Left: " + numCount + " PATTERN DOES NOT MATCH OTHERS";
+          tryAgain = true;
+        }
+
+        if (numCount === 0) {
+          resetRegistration();
+          socket.emit('registerPatterns', registerPatterns);
+        }
+      }
+    } else {
+      socket.emit('verifyPatterns', coords);
+    }
+  }
+}
+
+let resetVerification = false;
+
+socket.on('returnVerification', (data) => {
+  if (data.isValid) {
+    document.getElementById("deviceLock").innerHTML = 'Device: Unlocked';
+  } else {
+    document.getElementById("deviceLock").innerHTML = 'Attempt: Failed';
+  }
+  resetVerification = true;
+});
+
+let deletePatterns = (col) => {
+  Object.keys(col).forEach(key => {
+    patternCount = 0;
+    clearPath(col[key]);
+    delete col[key];
+  });
 }
 
 let leapMotionControl = (frame) => {
@@ -30,7 +131,13 @@ let leapMotionControl = (frame) => {
       let gesture = getGesture(hand, position, gstate);
 
       if (!gesture.locked) {
-        document.getElementById("lockDraw").innerHTML = 'Drawing';
+        if (resetVerification) {
+          deletePatterns(patterns);
+          resetVerification = false;
+        }
+
+        document.getElementById("handLock").innerHTML = 'Hand: Drawing';
+
         if (!patterns.hasOwnProperty(patternCount)) {
           patterns[patternCount] = [];
           patternsBuffer[patternCount] = [];
@@ -40,30 +147,24 @@ let leapMotionControl = (frame) => {
         let meshesBuffer = patternsBuffer[patternCount];
         changeCount = true;
 
-        drawPath(hand, frame, meshes, meshesBuffer);
+        draw(hand, frame, meshes, meshesBuffer);
       } else {
-        document.getElementById("lockDraw").innerHTML = 'Locked';
+        document.getElementById("handLock").innerHTML = 'Hand: Locked';
+
         if (changeCount) {
           patternCount++;
-          patternCountBuf = patternCount;
           changeCount = false;
         }
 
         if (gesture.swipeDirection === SWIPE_LEFT) {
-          patternCount = Math.max(0, patternCount - 1);
-          patternCountBuf = patternCount;
-          if (patterns.hasOwnProperty(patternCount)) {
+          let tempCount = Math.max(0, patternCount - 1);
+          if (patterns.hasOwnProperty(tempCount)) {
+            patternCount = tempCount;
             let meshes = patterns[patternCount];
             clearPath(meshes);
             delete patterns[patternCount];
           }
-        } else if (gesture.swipeDirection === SWIPE_LEFT) {
-          patternCountBuf = Math.min(patternCountBuf + 1, Object.keys(patternsBuffer).length - 1);
-          if (patterns.hasOwnProperty(patternCountBuf)) {
-            let meshes = patternCountBuf[patternCountBuf];
-          }
         }
-
         if (!gesture.normalUp && gesture.palmDirection === -1) {
           saveData(patterns);
         }
@@ -96,11 +197,11 @@ let leapMotionControl = (frame) => {
     scene.add(new THREE.AmbientLight(0x888888));
 
     let axis = new THREE.AxisHelper(8);
-    axis.position.set(0, -10.5, 0);
+    axis.position.set(0, -9, 0);
     scene.add(axis);
 
     let pointLight = new THREE.PointLight(0xFFffff);
-    pointLight.position = new THREE.Vector3(-20, 10, 0);
+    pointLight.position = new THREE.Vector3(-20, 9, 0);
     pointLight.lookAt(new THREE.Vector3(0, 0, 0));
     scene.add(pointLight);
 
@@ -119,7 +220,7 @@ let leapMotionControl = (frame) => {
     let pusheenMaterial = new THREE.MeshLambertMaterial( { map: pusheenTexture } );
     let geometry = new THREE.BoxGeometry(40, 1, 40);
     let mesh = new THREE.Mesh(geometry, pusheenMaterial);
-    mesh.position.set(0, -10, 0);
+    mesh.position.set(0, -9, 0);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     scene.add(mesh);
@@ -183,15 +284,18 @@ let getCoord = (hand) => {
 }
 
 let clearPath = (meshes) => meshes.forEach(x => scene.remove(x['mesh']));
+let drawPath = (meshes) => meshes.forEach(x => scene.add(x['mesh']));
 
-let drawPath = (hand, frame, meshes, meshesBuffer) => {
+let draw = (hand, frame, meshes, meshesBuffer) => {
   if (hand) {
     let mesh = pathQuantum.clone();
     let coord = getCoord(hand);
     mesh.position.copy(coord);
     let json = {'mesh' : mesh, 'coord' : coord};
+
     meshes.push(json);
     meshesBuffer.push(json);
+
     scene.add(mesh);
   }
 }
