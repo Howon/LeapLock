@@ -102,3 +102,18 @@ let isCorrect = (path1, path2) => {
     return false
   }
 }
+
+let isValidPath = (combinations, target) => {
+  let numCorrect = combinations.filter(pattern => {
+    let returnFlag = true;
+    Object.keys(pattern).forEach(key => {
+      if (!target.hasOwnProperty(key) ||
+            !isCorrect(pattern[key], target[key])) {
+        returnFlag = false;
+      }
+    })
+    return returnFlag;
+  }).length;
+
+  return numCorrect === registrationPatterns.length
+}

@@ -25,7 +25,7 @@ const SWIPEFRAMERATE = 2;
 const PALMCOOLDOWN = 50;
 const SWIPECOOLDOWN = 20;
 const PALMMOVEVELOCTIY = 450;
-const LOCKFRAMERATE = 15; // increase to have elongate fisting time
+const LOCKFRAMERATE = 10; // increase to have elongate fisting time
 
 function Gesture(xpos, ypos, zpos, pdirection, sdirection, normalUp, isLocked, swipeDir) {
   if (!isLocked) {

@@ -13,7 +13,12 @@ let registering = false;
 let resetRegistration = () => {
   document.getElementById('registrationCount').style.display = "none";
   document.getElementById('registerButton').style.backgroundColor = "#4CAF50";
+
   registering = false;
+  registrationPatterns.forEach(patterns => {
+    deletePatterns(patterns);
+  });
+  numCount = NUM_REQUIRED_PATTERNS;
 }
 
 let registerLock = () => {
@@ -63,33 +68,21 @@ let saveData = (saveBlock) => {
 
       if (pathTooShort) {
         document.getElementById('registrationCount').innerHTML =
-        "Patterns Left: " + numCount + " PATH TOO SHORT";
+            "Patterns Left: " + numCount + " PATH TOO SHORT";
       } else {
-        let numCorrect = registrationPatterns.filter(pattern => {
-          Object.keys(pattern).forEach(key => {
-            if (!(coords.hasOwnProperty(key) &&
-                  isCorrect(pattern[key], coords[key]))) {
-              return false;
-            }
-          })
-          return true;
-        }).length
-
-        console.log(numCorrect);
-        if (numCorrect === registrationPatterns.length) {
-          numCount--;
+        if (isValidPath(registrationPatterns, coords)) {
           registrationPatterns.push(coords);
           document.getElementById('registrationCount').innerHTML =
-            "Patterns Left: " + --numCount;
+              "Patterns Left: " + --numCount;
         } else {
           document.getElementById('registrationCount').innerHTML =
-            "Patterns Left: " + numCount + " PATTERN DOES NOT MATCH OTHERS";
+              "Patterns Left: " + numCount + " PATTERN DOES NOT MATCH OTHERS";
           tryAgain = true;
         }
 
         if (numCount === 0) {
+          socket.emit('registerPatterns', registrationPatterns);
           resetRegistration();
-          socket.emit('registerPatterns', registerPatterns);
         }
       }
     } else {

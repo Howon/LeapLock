@@ -19,14 +19,14 @@ let firebase = require('firebase');
 firebase.initializeApp(config.firebase);
 
 let db = firebase.database();
-let ref = db.ref("/patterns");
+let patternRef = db.ref("/patterns");
 
 server.listen(config.port);
 app.set('views', path.join(__dirname, 'public/views'));
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public/static')));
 
-require('./scripts/socket')(io, ref, openLock);
+require('./scripts/socket')(io, patternRef, openLock);
 require('./routes/routes')(app);
 
 console.log("*****************************");
