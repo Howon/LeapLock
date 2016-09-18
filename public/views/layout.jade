@@ -14,10 +14,51 @@ html.
       text-align: center;
       background-color: #FAFAFA;
     }
-    #lockDraw {
-      margin-top: 100px;
+
+    .text {
+      margin-top: 20px;
       font-family: Gill Sans Extrabold, sans-serif;
       font-size: 20px;
+    }
+
+    #handLock {
+      margin-top: 50px;
+    }
+
+    button {
+      background-color: #4CAF50; /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #registerButton {
+      position: absolute;
+      float: right;
+      right: 100px;
+    }
+
+    #registrationCount {
+      display: none;
+      color: #FF2541;
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: 20px auto;
+    }
+
+    #userNameForm {
+      position: absolute;
+      float: right;
+      right: 100px;
+      top: 120px;
+      display: none;
+      z-index: 400px;
     }
   </style>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
@@ -32,9 +73,16 @@ html.
   </body>
   <img id="pusheen" style='display: none;' src='/images/pusheen.jpg'>
   <img id="pusheen-dot" style='display: none;' src='/images/pusheen-dot.jpg'>
-  <div id="lockDraw">
-    Locked
+  <div id="handLock" class="text status">
+    Hand: <b>Locked</b>
   </div>
+  <div id="deviceLock" class="text status">
+    Device: <b>Locked</b>
+  </div>
+
+  <div id="registrationCount" class="text"></div>
+  <button id="registerButton" type="button" onClick="registerLock()">Register Lock</button>
+
   <script src='/js/run/motionDetect.js'></script>
   <script src='/js/run/compressData.js'></script>
   <script src='/js/run/leap.js'></script>
