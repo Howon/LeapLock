@@ -14,6 +14,11 @@ html.
       text-align: center;
       background-color: #FAFAFA;
     }
+    #lockDraw {
+      margin-top: 100px;
+      font-family: Gill Sans Extrabold, sans-serif;
+      font-size: 20px;
+    }
   </style>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
   <script type="text/javascript" src="https://js.leapmotion.com/leap-0.6.3.js"></script>
@@ -24,6 +29,10 @@ html.
   </body>
   <img id="pusheen" style='display: none;' src='/images/pusheen.jpg'>
   <img id="pusheen-dot" style='display: none;' src='/images/pusheen-dot.jpg'>
+  <div id="lockDraw">
+    Locked
+  </div>
   <script src='/js/run/motionDetect.js'></script>
+  <script src='/js/run/compressData.js'></script>
   <script src='/js/run/leap.js'></script>
   </html>

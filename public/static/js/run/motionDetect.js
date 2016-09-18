@@ -15,7 +15,7 @@ function GestureState() {
   this.palmCoolDown = 0;
 }
 
-const MIN_VALUE = 0.4;
+const MIN_VALUE = 0.35;
 
 const MAXXPOS = 400;
 const MAXYPOS = 500;
@@ -24,8 +24,8 @@ const PALMMOVEFRAMERATE = 1;
 const SWIPEFRAMERATE = 2;
 const PALMCOOLDOWN = 50;
 const SWIPECOOLDOWN = 20;
-const PALMMOVEVELOCTIY = 500;
-const LOCKFRAMERATE = 20; // increase to have elongate fisting time
+const PALMMOVEVELOCTIY = 450;
+const LOCKFRAMERATE = 15; // increase to have elongate fisting time
 
 function Gesture(xpos, ypos, zpos, pdirection, sdirection, normalUp, isLocked, swipeDir) {
   if (!isLocked) {
@@ -60,6 +60,7 @@ function getExtendedFingers(hand) {
 
 function checkFist(hand) {
   let sum = 0;
+
   for (let i = 0; i < hand.fingers.length; i++) {
     let finger = hand.fingers[i];
     let meta = finger.bones[0].direction();
@@ -86,11 +87,13 @@ function checkNormal(hand) {
 
 function checkPalm(hand) {
   let velocity = hand.palmVelocity[1];
+
   if (velocity > PALMMOVEVELOCTIY) {
     return 1;
   } else if (velocity < -PALMMOVEVELOCTIY) {
     return -1;
   }
+
   return 0;
 }
 
@@ -119,26 +122,26 @@ let getGesture = function(hand, position, gstate) {
   }
 
   let swipeMag = (position[0] - 30) / MAXXPOS;
-  if (swipeMag < -0.3) {
+  if (swipeMag < -0.35) {
     gstate.isPalmSwipingLeft = false;
     gstate.numPalmSwipingLeft = 0;
     if (gstate.numPalmSwipingRight++ > SWIPEFRAMERATE) {
       if (!gstate.isPalmSwipingRight) {
         gstate.isPalmSwipingRight = true;
         swipeDirection = 1;
-        if (gstate.palmSwipeCoolDown == 0) {
+        if (gstate.palmSwipeCoolDown === 0) {
           gstate.palmSwipeCoolDown = SWIPECOOLDOWN;
         }
       }
     }
-  } else if (swipeMag > 0.3) {
+  } else if (swipeMag > 0.35) {
     gstate.isPalmSwipingRight = false;
     gstate.numPalmSwipingRight = 0;
     if (gstate.numPalmSwipingLeft++ > SWIPEFRAMERATE) {
       if (!gstate.isPalmSwipingLeft) {
         gstate.isPalmSwipingLeft = true;
         swipeDirection = -1;
-        if (gstate.palmSwipeCoolDown == 0) {
+        if (gstate.palmSwipeCoolDown === 0) {
           gstate.palmSwipeCoolDown = SWIPECOOLDOWN;
         }
       }
@@ -159,7 +162,7 @@ let getGesture = function(hand, position, gstate) {
       if (!gstate.isPalmMovingUp) {
         gstate.isPalmMovingUp = true;
         palmMoveDirection = 1;
-        if (gstate.palmCoolDown == 0) {
+        if (gstate.palmCoolDown === 0) {
           gstate.palmCoolDown = PALMCOOLDOWN;
         }
       }
@@ -171,7 +174,7 @@ let getGesture = function(hand, position, gstate) {
       if (!gstate.isPalmMovingDown) {
         gstate.isPalmMovingDown = true;
         palmMoveDirection = -1;
-        if (gstate.palmCoolDown == 0) {
+        if (gstate.palmCoolDown === 0) {
           gstate.palmCoolDown = PALMCOOLDOWN;
         }
       }
@@ -206,27 +209,6 @@ let getGesture = function(hand, position, gstate) {
   }
   return new Gesture(hand.stabilizedPalmPosition[0], hand.stabilizedPalmPosition[1], hand.stabilizedPalmPosition[2], palmMoveDirection, swipeDirection, normalUp, gstate.locked);
 }
-
-visualizeHand = function(controller) {
-  controller.use('playback', {
-    timeBetweenLoops: 100,
-    pauseOnHand: true
-  }).on('riggedHand.meshAdded', function(handMesh, leapHand) {
-    handMesh.material.opacity = 1;
-  });
-
-  let overlay = controller.plugins.playback.player.overlay;
-  overlay.style.right = 0;
-  overlay.style.left = 'auto';
-  overlay.style.top = 'auto';
-  overlay.style.padding = 0;
-  overlay.style.bottom = '13px';
-  overlay.style.width = '180px';
-
-  controller.use('riggedHand', {
-    scale: 1,
-  });
-};
 
 const SWIPE_LEFT = 1;
 const SWIPE_RIGHT = -1;
