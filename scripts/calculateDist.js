@@ -16,7 +16,7 @@ let getSimilarity = (path1, path2) => {
   return dotProduct(path1, path2);
 }
 
-const CORRECT_THRESHOLD = 80;
+const CORRECT_THRESHOLD = 65;
 
 let isCorrect = (path1, path2) => {
   if (getSimilarity(path1, path2) > CORRECT_THRESHOLD) {

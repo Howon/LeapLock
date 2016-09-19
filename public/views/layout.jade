@@ -13,11 +13,11 @@ html.
       overflow: hidden;
       text-align: center;
       background-color: #FAFAFA;
+      font-family: Gill Sans Extrabold, sans-serif;
     }
 
     .text {
       margin-top: 20px;
-      font-family: Gill Sans Extrabold, sans-serif;
       font-size: 20px;
     }
 
@@ -60,6 +60,19 @@ html.
       display: none;
       z-index: 400px;
     }
+
+    ul {
+      position: absolute;
+      list-style-type: none;
+      margin-top: 100px;
+      text-align: left;
+      left: 50px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
   </style>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
   <script type="text/javascript" src="https://js.leapmotion.com/leap-0.6.3.js"></script>
@@ -80,6 +93,12 @@ html.
   <div id="registrationCount" class="text"></div>
   <button id="registerButton" type="button" onClick="registerLock()">Register Lock</button>
 
+  <ul>
+    <li> Clench your fist to start drawing </li>
+    <li> Clench your fist again to stop drawing </li>
+    <li> Once in Lock mode, swipe left to undo </li>
+    <li> Lower your hand to submit unlock request </li>
+  </ul>
   <script src='/js/run/motionDetect.js'></script>
   <script src='/js/run/compressData.js'></script>
   <script src='/js/run/leap.js'></script>

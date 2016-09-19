@@ -15,10 +15,10 @@ function GestureState() {
   this.palmCoolDown = 0;
 }
 
-const MIN_VALUE = 0.35;
+const MIN_VALUE = 0.5;
 
 const MAXXPOS = 400;
-const MAXYPOS = 500;
+const MAXYPOS = 600;
 const MAXZPOS = 750;
 const PALMMOVEFRAMERATE = 1;
 const SWIPEFRAMERATE = 2;

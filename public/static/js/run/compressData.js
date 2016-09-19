@@ -91,7 +91,7 @@ let normalizeVectors = (vectors) => vectors.map(vec => toUnit(vec));
 
 let getSimilarity = (path1, path2) => dotProduct(path1, path2);
 
-const CORRECT_THRESHOLD = 80;
+const CORRECT_THRESHOLD = 65;
 
 let isCorrect = (path1, path2) => {
   if (getSimilarity(path1, path2) > CORRECT_THRESHOLD) {
